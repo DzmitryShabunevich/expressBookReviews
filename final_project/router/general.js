@@ -33,43 +33,58 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    return res.send(JSON.stringify(books, null, 4));
+    new Promise ((resolve, reject) =>{
+    if (books){
+        resolve(JSON.stringify(books, null, 4));
+    } else {
+        reject("No books found")
+    }
+    }).then(data => res.send(data))
+    .catch(err => res.status(404).send(err));
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
     const ISBN = req.params.isbn;
-    if(books[ISBN]){
-        res.status(200).send(books[ISBN]);
-    }
-    else{
-        return res.status(404).send(`There is no such book in the registry with ISBN ${ISBN}`);
-    }
+    new Promise ((resolve, reject) =>{
+        if (books[ISBN]){
+            resolve(books[ISBN]);
+        } else {
+            reject(`There is no such book in the registry with ISBN ${ISBN}`)
+        }
+        }).then(data => res.send(data))
+        .catch(err => res.status(404).send(err));
  });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
     const authorFromParam = req.params.author;
     const booksByAuthor = Object.values(books).filter(book => book.author.includes(authorFromParam) );
-    if(booksByAuthor.length > 0){
-        res.status(200).send(JSON.stringify(booksByAuthor, null, 4));
-    }
-    else{
-        return res.status(404).send(`There is no such book in the registry written by author ${authorFromParam}`);
-    }
-});
+    new Promise ((resolve, reject) => {
+        if (booksByAuthor.length > 0){
+            resolve(JSON.stringify(booksByAuthor, null, 4));
+        } else {
+            reject(`There is no such book in the registry written by author ${authorFromParam}`)
+        }
+        })
+        .then(data => res.send(data))
+        .catch(err => res.status(404).send(err));
+    });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     const titleFromParaps = req.params.title;
     const booksByTitle = Object.values(books).filter(book => book.title.includes(titleFromParaps) );
-    if(booksByTitle.length > 0){
-        res.status(200).send(JSON.stringify(booksByTitle, null, 4));
-    }
-    else{
-        return res.status(404).send(`There is no such book in the registry with the title ${titleFromParaps}`);
-    }
-});
+    new Promise ((resolve, reject) => {
+        if (booksByTitle.length > 0){
+            resolve(JSON.stringify(booksByTitle, null, 4));
+        } else {
+            reject(`There is no such book in the registry with the title ${titleFromParaps}`)
+        }
+        })
+        .then(data => res.send(data))
+        .catch(err => res.status(404).send(err));
+    });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
